@@ -143,7 +143,6 @@ document.addEventListener('DOMContentLoaded', () => {
             productosAPI.forEach(producto => {
                 const opcion = document.createElement('option');
                 opcion.value = producto.id;
-                // El servidor devuelve "descripcion"
                 opcion.textContent = `${producto.id} - ${producto.descripcion}`;
                 selectProducto.appendChild(opcion);
             });
@@ -156,7 +155,6 @@ document.addEventListener('DOMContentLoaded', () => {
     // 2. Cuando se selecciona un producto, mostrar su info
     if (selectProducto) {
         selectProducto.addEventListener('change', () => {
-            // El servidor devuelve "descripcion" y "precio"
             const productoSeleccionado = productosAPI.find(p => p.id === selectProducto.value);
 
             if (productoSeleccionado) {
@@ -200,8 +198,8 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             const cart = getCart();
-            // Comprobamos si ya existe por ID (sin talla porque aquí no se elige)
-            const existente = cart.find(item => item.id === producto.id && !item.size);
+            // Comprobamos si ya existe por ID
+            const existente = cart.find(item => item.id === producto.id && item.size === 'Única');
 
             if (existente) {
                 existente.quantity = Number(existente.quantity || 1) + cantidad;
@@ -210,8 +208,10 @@ document.addEventListener('DOMContentLoaded', () => {
                     id: producto.id,
                     name: producto.descripcion,
                     price: producto.precio,
-                    quantity: cantidad
-                    // Nota: aquí no se guarda talla porque el formulario rápido no la pide
+                    quantity: cantidad,
+                    image: producto.imagen,
+                    size: 'Única',
+                    description: 'Prenda seleccionada: ${producto.descripcion}. Ideal para complementar tu estilo'
                 });
             }
 
@@ -221,7 +221,6 @@ document.addEventListener('DOMContentLoaded', () => {
             mensajeCompra.textContent = '¡Producto añadido correctamente!';
             mensajeCompra.className = 'mt-3 text-success';
             
-            // Limpiamos el formulario tras añadir
             selectProducto.value = '';
             descripcionProducto.value = '';
             precioProducto.value = '';

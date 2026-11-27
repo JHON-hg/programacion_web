@@ -91,8 +91,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 </div>
             </div>
             <div class="resumen-price">S/ ${totalProducto.toFixed(2)}</div>
-            <div class="resumen-meta">${prod.description || ''}</div>
-        `;
+            <div class="resumen-meta">${prod.description || 'Prenda seleccionada de la tienda WUOLUX.'}</div>`;
         lista.appendChild(item);
     });
 
