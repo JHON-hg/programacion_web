@@ -6,24 +6,32 @@ document.addEventListener('DOMContentLoaded', () => {
     const searchInput = document.getElementById('home-search');
     const suggestionsBox = document.getElementById('home-search-suggestions');
     const featuredContainer = document.getElementById('featured-products');
+
+    // Catálogo local con IDs alineados al servidor.
     const productCatalog = [
-        { name: 'Polo Haver', img: 'img/polo1.png', price: 39.99, category: 'polo' },
-        { name: 'Polo Mayoral', img: 'img/polo2.png', price: 29.99, category: 'polo' },
-        { name: 'Chompa casual', img: 'img/compa1.jpeg', price: 39.99, category: 'chompa' },
-        { name: 'Polo Puma', img: 'img/polo3.png', price: 29.99, category: 'polo' },
-        { name: 'Casaca premium', img: 'img/casaca1.jpeg', price: 49.99, category: 'casacas' },
-        { name: 'Pantalón clásico', img: 'img/pantalon1.png', price: 44.99, category: 'pantalones' },
-        { name: 'Chompa urbana', img: 'img/chompa2.jpeg', price: 39.99, category: 'chompa' },
-        { name: 'Polo Cars', img: 'img/polo4.png', price: 29.99, category: 'polo' },
-        { name: 'Casaca casual', img: 'img/casaca2.jpeg', price: 24.99, category: 'casacas' },
-        { name: 'Pantalón sport', img: 'img/pantalon2.png', price: 54.99, category: 'pantalones' },
-        { name: 'Polo astral', img: 'img/polo5.jpg', price: 24.99, category: 'polo' },
-        { name: 'Chompa elegante', img: 'img/chompa3.jpeg', price: 44.99, category: 'chompa' },
-        { name: 'Casaca invierno', img: 'img/casaca4.jpeg', price: 54.99, category: 'casacas' },
-        { name: 'Polo Mickey Mouse', img: 'img/polo6.png', price: 29.99, category: 'polo' },
-        { name: 'Pantalón casual', img: 'img/pantalon3.jpeg', price: 44.99, category: 'pantalones' },
-        { name: 'Chompa premium', img: 'img/chompa4.jpeg', price: 49.99, category: 'chompa' }
+        { id: 'P001', name: 'Polo Haver', img: 'img/polo1.png', price: 39.99, category: 'polo' },
+        { id: 'P002', name: 'Polo Mayoral', img: 'img/polo2.png', price: 29.99, category: 'polo' },
+        { id: 'P003', name: 'Chompa casual', img: 'img/compa1.jpeg', price: 39.99, category: 'chompa' },
+        { id: 'P004', name: 'Polo Puma', img: 'img/polo3.png', price: 29.99, category: 'polo' },
+        { id: 'P005', name: 'Casaca premium', img: 'img/casaca1.jpeg', price: 49.99, category: 'casacas' },
+        { id: 'P006', name: 'Pantalón clásico', img: 'img/pantalon1.png', price: 44.99, category: 'pantalones' },
+        { id: 'P007', name: 'Chompa urbana', img: 'img/chompa2.jpeg', price: 39.99, category: 'chompa' },
+        { id: 'P008', name: 'Polo Cars', img: 'img/polo4.png', price: 29.99, category: 'polo' },
+        { id: 'P009', name: 'Casaca casual', img: 'img/casaca2.jpeg', price: 24.99, category: 'casacas' },
+        { id: 'P010', name: 'Pantalón sport', img: 'img/pantalon2.png', price: 54.99, category: 'pantalones' },
+        { id: 'P011', name: 'Polo astral', img: 'img/polo5.jpg', price: 24.99, category: 'polo' },
+        { id: 'P012', name: 'Chompa elegante', img: 'img/chompa3.jpeg', price: 44.99, category: 'chompa' },
+        { id: 'P013', name: 'Casaca invierno', img: 'img/casaca4.jpeg', price: 54.99, category: 'casacas' },
+        { id: 'P014', name: 'Polo Mickey Mouse', img: 'img/polo6.png', price: 29.99, category: 'polo' },
+        { id: 'P015', name: 'Pantalón casual', img: 'img/pantalon3.jpeg', price: 57.99, category: 'pantalones' },
+        { id: 'P016', name: 'Chompa premium', img: 'img/chompa4.jpeg', price: 49.99, category: 'chompa' }
     ];
+
+    // Resuelve el id de un producto a partir de su nombre.
+    function getIdByName(name) {
+        const found = productCatalog.find(p => p.name === name);
+        return found ? found.id : '';
+    }
 
     // Filtra el catálogo según el texto ingresado y muestra hasta 6
     // sugerencias en el cuadro desplegable de búsqueda.
@@ -52,15 +60,13 @@ document.addEventListener('DOMContentLoaded', () => {
         `).join('');
         suggestionsBox.style.display = 'block';
 
-        // Al hacer clic en una sugerencia, se busca ese producto.
         suggestionsBox.querySelectorAll('.suggestion-item').forEach(item => {
             item.addEventListener('click', () => searchProducts(item.dataset.name));
         });
     }
 
-    // Busca un producto por nombre exacto o parcial dentro del catálogo y,
-    // si lo encuentra, lo guarda como producto seleccionado y redirige a la
-    // página de detalle.
+    // Busca un producto por nombre en el catálogo y guarda el objeto
+    // seleccionado (con id, precio, imagen, categoría) en localStorage.
     function searchProducts(query) {
         const value = query.trim();
         if (!value) return;
@@ -71,6 +77,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!product) return;
 
         const selectedProduct = {
+            id: product.id,
             name: product.name,
             price: product.price,
             image: product.img,
@@ -84,7 +91,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Devuelve una cantidad aleatoria ('count') de productos, tomándolos de
     // las tarjetas ya presentes en la página si existen, o del catálogo
-    // interno como respaldo. Se usa para el carrusel y los destacados.
+    // interno como respaldo. Incluye id en todos los casos.
     function getRandomProducts(count) {
         if (productCards.length) {
             const shuffled = [...productCards].sort(() => Math.random() - 0.5);
@@ -94,6 +101,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const imgEl = card.querySelector('img.prod-img');
                 const price = parseFloat(priceText.replace(/[^\d.]/g, '')) || 0;
                 return {
+                    id: getIdByName(title),
                     title,
                     price,
                     image: imgEl ? imgEl.getAttribute('src') : '',
@@ -104,6 +112,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const shuffled = [...productCatalog].sort(() => Math.random() - 0.5);
         return shuffled.slice(0, count).map(product => ({
+            id: product.id,
             title: product.name,
             price: product.price,
             image: product.img,
@@ -112,9 +121,10 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Guarda el producto del botón "Comprar" clickeado como producto
-    // seleccionado y redirige a la página de detalle.
+    // seleccionado (incluyendo su id) y redirige a la página de detalle.
     function buyProduct(button) {
         const selectedProduct = {
+            id: button.dataset.id || '',
             name: button.dataset.title,
             price: Number(button.dataset.price),
             image: button.dataset.image,
@@ -137,7 +147,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 <img src="${product.image}" alt="${product.title}" class="prod-img">
                 <p>S/ ${product.price.toFixed(2)}</p>
                 <h3>${product.title}</h3>
-                <button class="style-btn" data-title="${product.title}" data-price="${product.price}" data-image="${product.image}" data-category="${product.category}">Comprar</button>
+                <button class="style-btn"
+                    data-id="${product.id}"
+                    data-title="${product.title}"
+                    data-price="${product.price}"
+                    data-image="${product.image}"
+                    data-category="${product.category}">Comprar</button>
             </div>
         `).join('');
 
@@ -157,7 +172,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 <img src="${product.image}" alt="${product.title}" class="prod-img">
                 <h3>${product.title}</h3>
                 <p class="price">S/ ${product.price.toFixed(2)}</p>
-                <button class="buy-btn" data-title="${product.title}" data-price="${product.price}" data-image="${product.image}" data-category="${product.category}">Comprar</button>
+                <button class="buy-btn"
+                    data-id="${product.id}"
+                    data-title="${product.title}"
+                    data-price="${product.price}"
+                    data-image="${product.image}"
+                    data-category="${product.category}">Comprar</button>
             </div>
         `).join('');
 
@@ -172,32 +192,22 @@ document.addEventListener('DOMContentLoaded', () => {
     if (carousel && botonDerecha) {
         const scrollAmount = 232;
 
-        // Al hacer clic en la flecha derecha, desplaza el carrusel; si ya
-        // llegó al final, vuelve suavemente al inicio.
         botonDerecha.addEventListener('click', () => {
             const maxScrollLeft = carousel.scrollWidth - carousel.clientWidth;
 
             if (carousel.scrollLeft + scrollAmount >= maxScrollLeft) {
-                carousel.scrollTo({
-                    left: 0,
-                    behavior: 'smooth'
-                });
+                carousel.scrollTo({ left: 0, behavior: 'smooth' });
             } else {
-                carousel.scrollBy({
-                    left: scrollAmount,
-                    behavior: 'smooth'
-                });
+                carousel.scrollBy({ left: scrollAmount, behavior: 'smooth' });
             }
         });
     }
 
     if (searchInput) {
-        // Muestra sugerencias mientras el usuario escribe en el buscador.
         searchInput.addEventListener('input', (e) => {
             showSuggestions(e.target.value);
         });
 
-        // Maneja las teclas Enter (buscar) y Escape (cerrar sugerencias).
         searchInput.addEventListener('keydown', (e) => {
             if (e.key === 'Enter') {
                 e.preventDefault();
@@ -209,7 +219,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Cierra el cuadro de sugerencias al hacer clic fuera del buscador.
     document.addEventListener('click', (e) => {
         if (suggestionsBox && !e.target.closest('.search-wrapper')) {
             suggestionsBox.innerHTML = '';
@@ -219,7 +228,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const btnSuscribirse = document.querySelector('footer button');
     if (btnSuscribirse) {
-        // Al hacer clic en "Suscribirse" del footer, muestra una alerta de agradecimiento.
         btnSuscribirse.addEventListener('click', (e) => {
             e.preventDefault();
             alert("¡Gracias por suscribirte a WUOLUX!");

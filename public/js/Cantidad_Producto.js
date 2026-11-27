@@ -60,13 +60,16 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    
     if (addToCartBtn) {
-        // Al hacer clic en "Agregar al carrito": toma la talla seleccionada y
-        // la cantidad actual, agrega o suma el producto en el carrito guardado
-        // en localStorage, y redirige a la página del carrito.
+
         addToCartBtn.addEventListener('click', () => {
+
             const selectedSizeInput = document.querySelector('input[name="talla"]:checked');
-            const selectedSize = selectedSizeInput ? selectedSizeInput.nextElementSibling?.textContent.trim() : 'Única';
+
+            const selectedSize = selectedSizeInput
+                ? selectedSizeInput.nextElementSibling?.textContent.trim()
+                : 'Única';
 
             const product = selectedProduct || {
                 name: productTitle?.textContent || 'Producto',
@@ -75,22 +78,47 @@ document.addEventListener('DOMContentLoaded', () => {
                 description: productDescription?.textContent || ''
             };
 
+            // Buscar el producto en nuestro catálogo
+            const productoCatalogo = productCatalog.find(p =>
+                p.name.toLowerCase() === product.name.toLowerCase()
+            );
+
+            // Obtener el ID del producto
+            const productId = product.id || productoCatalogo?.id;
+
+            // Comprobar que el producto tenga ID
+            if (!productId) {
+                alert('No se encontró el código del producto.');
+                return;
+            }
+
+            // Obtener el carrito actual
             const cart = JSON.parse(localStorage.getItem('carrito') || '[]');
+
+            // Crear el nuevo producto
             const newItem = {
                 ...product,
+                id: productId,
                 size: selectedSize,
                 quantity: cantidad,
-                price: Number(product.price || 0)
+                price: Number(productoCatalogo ? productoCatalogo.price : product.price)
             };
 
-            const existingItem = cart.find(item => item.name === newItem.name && item.size === newItem.size);
+            // Comprobar si ya existe en el carrito
+            const existingItem = cart.find(item =>
+                item.id === newItem.id && item.size === newItem.size
+            );
+
             if (existingItem) {
                 existingItem.quantity += newItem.quantity;
             } else {
                 cart.push(newItem);
             }
 
+            // Guardar el carrito
             localStorage.setItem('carrito', JSON.stringify(cart));
+
+            // Ir al carrito
             window.location.href = 'Carrito.html';
         });
     }
@@ -98,24 +126,26 @@ document.addEventListener('DOMContentLoaded', () => {
     const searchInput = document.getElementById('home-search');
     const suggestionsBox = document.getElementById('home-search-suggestions');
 
+
     const productCatalog = [
-        { name: 'Polo Haver', img: 'img/polo1.png', price: 39.99, category: 'polo' },
-        { name: 'Polo Mayoral', img: 'img/polo2.png', price: 29.99, category: 'polo' },
-        { name: 'Chompa casual', img: 'img/compa1.jpeg', price: 39.99, category: 'chompa' },
-        { name: 'Polo Puma', img: 'img/polo3.png', price: 29.99, category: 'polo' },
-        { name: 'Casaca premium', img: 'img/casaca1.jpeg', price: 49.99, category: 'casacas' },
-        { name: 'Pantalon clásico', img: 'img/pantalon1.png', price: 44.99, category: 'pantalones' },
-        { name: 'Chompa urbana', img: 'img/chompa2.jpeg', price: 39.99, category: 'chompa' },
-        { name: 'Polo Cars', img: 'img/polo4.png', price: 29.99, category: 'polo' },
-        { name: 'Casaca casual', img: 'img/casaca2.jpeg', price: 24.99, category: 'casacas' },
-        { name: 'Pantalón sport', img: 'img/pantalon2.png', price: 54.99, category: 'pantalones' },
-        { name: 'Polo astral', img: 'img/polo5.jpg', price: 24.99, category: 'polo' },
-        { name: 'Chompa elegante', img: 'img/chompa3.jpeg', price: 44.99, category: 'chompa' },
-        { name: 'Casaca invierno', img: 'img/casaca4.jpeg', price: 54.99, category: 'casacas' },
-        { name: 'Polo Mickey Mouse', img: 'img/polo6.png', price: 29.99, category: 'polo' },
-        { name: 'Pantalón casual', img: 'img/pantalon3.jpeg', price: 44.99, category: 'pantalones' },
-        { name: 'Chompa premium', img: 'img/chompa4.jpeg', price: 49.99, category: 'chompa' }
+        { id: "P001", name: 'Polo Haver', img: 'img/polo1.png', price: 39.99, category: 'polo' },
+        { id: "P002", name: 'Polo Mayoral', img: 'img/polo2.png', price: 29.99, category: 'polo' },
+        { id: "P003", name: 'Chompa casual', img: 'img/compa1.jpeg', price: 39.99, category: 'chompa' },
+        { id: "P004", name: 'Polo Puma', img: 'img/polo3.png', price: 29.99, category: 'polo' },
+        { id: "P005", name: 'Casaca premium', img: 'img/casaca1.jpeg', price: 49.99, category: 'casacas' },
+        { id: "P006", name: 'Pantalón clásico', img: 'img/pantalon1.png', price: 44.99, category: 'pantalones' },
+        { id: "P007", name: 'Chompa urbana', img: 'img/chompa2.jpeg', price: 39.99, category: 'chompa' },
+        { id: "P008", name: 'Polo Cars', img: 'img/polo4.png', price: 29.99, category: 'polo' },
+        { id: "P009", name: 'Casaca casual', img: 'img/casaca2.jpeg', price: 24.99, category: 'casacas' },
+        { id: "P010", name: 'Pantalón sport', img: 'img/pantalon2.png', price: 54.99, category: 'pantalones' },
+        { id: "P011", name: 'Polo astral', img: 'img/polo5.jpg', price: 24.99, category: 'polo' },
+        { id: "P012", name: 'Chompa elegante', img: 'img/chompa3.jpeg', price: 44.99, category: 'chompa' },
+        { id: "P013", name: 'Casaca invierno', img: 'img/casaca4.jpeg', price: 54.99, category: 'casacas' },
+        { id: "P014", name: 'Polo Mickey Mouse', img: 'img/polo6.png', price: 29.99, category: 'polo' },
+        { id: "P015", name: 'Pantalón casual', img: 'img/pantalon3.jpeg', price: 57.99, category: 'pantalones' },
+        { id: "P016", name: 'Chompa premium', img: 'img/chompa4.jpeg', price: 49.99, category: 'chompa' }
     ];
+
 
     // Filtra el catálogo según el texto ingresado y muestra hasta 6
     // sugerencias en el cuadro desplegable de búsqueda.
@@ -163,6 +193,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!product) return;
 
         const newSelectedProduct = {
+            id: product.id,
             name: product.name,
             price: product.price,
             image: product.img,

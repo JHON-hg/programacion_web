@@ -3,6 +3,28 @@ document.addEventListener('DOMContentLoaded', () => {
     const products = document.querySelectorAll('.shop-grid .product-card');
     let currentSearchQuery = '';
 
+    // Mapeo nombre → ID del catálogo del servidor (P001…P016).
+    // Sirve para que selectedProduct siempre lleve un id válido,
+    // sin depender de que Cantidad_Producto.js lo resuelva por nombre.
+    const productNameToId = {
+        'Polo Haver': 'P001',
+        'Polo Mayoral': 'P002',
+        'Chompa casual': 'P003',
+        'Polo Puma': 'P004',
+        'Casaca premium': 'P005',
+        'Pantalón clásico': 'P006',
+        'Chompa urbana': 'P007',
+        'Polo Cars': 'P008',
+        'Casaca casual': 'P009',
+        'Pantalón sport': 'P010',
+        'Polo astral': 'P011',
+        'Chompa elegante': 'P012',
+        'Casaca invierno': 'P013',
+        'Polo Mickey Mouse': 'P014',
+        'Pantalón casual': 'P015',
+        'Chompa premium': 'P016'
+    };
+
     // Muestra u oculta las tarjetas de producto según la categoría activa
     // (botón de filtro) y el texto de búsqueda actual.
     function applyFilter(filter) {
@@ -45,6 +67,8 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
+    // NOTA: el buscador visible en tienda.html (id="home-search") lo maneja
+    // js/modificaciones.js. Este archivo no debe duplicar ese listener.
     const searchInput = document.getElementById('shop-search');
     const suggestionsBox = document.getElementById('search-suggestions');
     const productCards = Array.from(products);
@@ -73,15 +97,14 @@ document.addEventListener('DOMContentLoaded', () => {
             return `<div class="suggestion-item" role="option">${thumb}<span class="suggestion-name">${m.name}</span></div>`;
         }).join('');
         suggestionsBox.style.display = 'block';
-        // Al hacer clic en una sugerencia, selecciona ese producto.
         suggestionsBox.querySelectorAll('.suggestion-item').forEach((el, idx) => {
             el.addEventListener('click', () => selectProduct(matches[idx].name));
         });
     }
 
     // Busca el producto por nombre en el índice de la tienda, arma el objeto
-    // de producto seleccionado con su precio real (leído de la tarjeta) y
-    // redirige a la página de detalle del producto.
+    // de producto seleccionado con su precio real (leído de la tarjeta) y su
+    // ID del catálogo, y redirige a la página de detalle.
     function selectProduct(name) {
         const match = productIndex.find(p => p.name === name);
         if (!match) return;
@@ -91,6 +114,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const price = parseFloat(priceText.replace(/[^\d.]/g, '')) || 0;
 
         const selectedProduct = {
+            id: productNameToId[match.name] || '',
             name: match.name,
             price,
             image: match.img,
@@ -109,8 +133,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     if (searchInput) {
-        // Al escribir en el buscador, filtra la grilla y muestra sugerencias
-        // que coincidan con el texto ingresado.
         searchInput.addEventListener('input', (e) => {
             const q = e.target.value.trim().toLowerCase();
             currentSearchQuery = e.target.value.trim();
@@ -123,8 +145,6 @@ document.addEventListener('DOMContentLoaded', () => {
             showSuggestions(matches);
         });
 
-        // Maneja las teclas Enter (ir directo al primer producto que coincide)
-        // y Escape (cerrar sugerencias).
         searchInput.addEventListener('keydown', (e) => {
             if (e.key === 'Enter') {
                 e.preventDefault();
@@ -136,7 +156,6 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
 
-        // Cierra el cuadro de sugerencias al hacer clic fuera del buscador.
         document.addEventListener('click', (e) => {
             if (!e.target.closest('.search-wrapper')) {
                 suggestionsBox.innerHTML = '';
@@ -145,8 +164,8 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Al hacer clic en "Comprar" de una tarjeta de producto, arma el objeto
-    // de producto seleccionado y redirige a la página de detalle.
+    // Al hacer clic en "Comprar" de una tarjeta, arma selectedProduct con su
+    // ID, nombre, precio, imagen, categoría y descripción, y redirige al detalle.
     document.querySelectorAll('.buy-btn').forEach(button => {
         button.addEventListener('click', () => {
             const card = button.closest('.product-card');
@@ -158,6 +177,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const price = parseFloat(priceText.replace(/[^\d.]/g, '')) || 0;
 
             const selectedProduct = {
+                id: productNameToId[title] || '',
                 name: title,
                 price,
                 image: imgEl ? imgEl.getAttribute('src') : '',
